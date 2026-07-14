@@ -23,8 +23,3 @@ Este projeto consiste no desenvolvimento de um ecossistema de Computação Ubíq
 *   **Android Studio:** Ambiente de desenvolvimento do aplicativo nativo.
 *   **RCFPVPro:** Aplicativo base/protocolo de comunicação com o drone.
 *   **MediaPipe (Gesture Recognizer):** Solução do Google utilizada para o reconhecimento e classificação dos gestos em tempo real.
-
-
-## 📄 Licença
-
-Este projeto está licenciado sob a Licença MIT - consulte o arquivo [LICENSE](LICENSE) para obter mais detalhes.
