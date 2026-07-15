@@ -304,11 +304,54 @@ class GestureRecognizerHelper(
         val finishTimeMs = SystemClock.uptimeMillis()
         val inferenceTime = finishTimeMs - result.timestampMs()
 
+        // Extrai o nome do gesto (ex: "Thumb_Up", "Victory", "Open_Palm")
+        val gestureName = result.gestures().firstOrNull()?.firstOrNull()?.categoryName()
+
+
+        if (gestureName != null) {
+            Log.d(TAG, "Nome do gesto: $gestureName")
+            // Envia para o serviço de acessibilidade clicar
+            processGestureForDrone(gestureName)
+        }
+
         gestureRecognizerListener?.onResults(
-            ResultBundle(
-                listOf(result), inferenceTime, input.height, input.width
-            )
+            ResultBundle(listOf(result), inferenceTime, input.height, input.width)
         )
+    }
+
+    private var lastActionTime = 0L
+    // Tempo em milissegundos que o sistema ignorará novos gestos após um sucesso
+    private val GESTURE_THROTTLE_MS = 2000L
+
+    private fun processGestureForDrone(gesture: String) {
+        val currentTime = System.currentTimeMillis()
+
+        // Verifica se o tempo passado desde o último gesto é menor que o intervalo definido
+        if (currentTime - lastActionTime < GESTURE_THROTTLE_MS) {
+            return
+        }
+
+        // Se chegar aqui, é porque o "sleep" acabou
+        when (gesture) {
+            "Thumb_Up" -> {
+                Log.i(TAG, "Executando: SUBIR")
+                DroneControlAccessibilityService.instance?.clickAt(725f, 460f)
+                lastActionTime = currentTime // Reseta o cronômetro
+            }
+            "Victory" -> {
+                Log.i(TAG, "Executando: DECOLAR")
+                DroneControlAccessibilityService.instance?.clickAt(200f, 800f)
+                lastActionTime = currentTime
+            }
+            "Open_Palm" -> {
+                Log.i(TAG, "Executando: POUSAR")
+                DroneControlAccessibilityService.instance?.clickAt(725f, 460f)
+                lastActionTime = currentTime
+            }
+            "None" -> {
+                // Não faz nada e não reseta o tempo
+            }
+        }
     }
 
     // Return errors thrown during recognition to this GestureRecognizerHelper's
