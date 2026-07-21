@@ -15,7 +15,12 @@
  */
 package com.google.mediapipe.examples.gesturerecognizer
 
+import android.app.PictureInPictureParams
+import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
+import android.util.Rational
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
@@ -29,6 +34,53 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(activityMainBinding.root)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val params = PictureInPictureParams.Builder()
+                .setAutoEnterEnabled(true)
+                .build()
+            setPictureInPictureParams(params)
+        }
+    }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        enterPipMode()
+    }
+
+    private fun enterPipMode() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val width = activityMainBinding.root.width
+            val height = activityMainBinding.root.height
+            
+            val builder = PictureInPictureParams.Builder()
+            
+            if (width > 0 && height > 0) {
+                // Aspect ratio must be between 0.4184 and 2.39
+                val ratio = width.toFloat() / height.toFloat()
+                if (ratio in 0.4184f..2.39f) {
+                    builder.setAspectRatio(Rational(width, height))
+                } else if (ratio < 0.4184f) {
+                    builder.setAspectRatio(Rational(418, 1000))
+                } else {
+                    builder.setAspectRatio(Rational(239, 100))
+                }
+            }
+            
+            enterPictureInPictureMode(builder.build())
+        }
+    }
+
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration
+    ) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        if (isInPictureInPictureMode) {
+            activityMainBinding.toolbar.visibility = View.GONE
+        } else {
+            activityMainBinding.toolbar.visibility = View.VISIBLE
+        }
     }
 
     override fun onBackPressed() {

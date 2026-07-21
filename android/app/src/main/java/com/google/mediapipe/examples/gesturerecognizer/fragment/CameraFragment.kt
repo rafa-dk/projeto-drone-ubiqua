@@ -98,6 +98,16 @@ class CameraFragment : Fragment(),
             viewModel.setDelegate(gestureRecognizerHelper.currentDelegate)
 
             // Close the Gesture Recognizer helper and release resources
+            // Don't close if we are in Picture-in-Picture mode
+            if (activity?.isInPictureInPictureMode != true) {
+                backgroundExecutor.execute { gestureRecognizerHelper.clearGestureRecognizer() }
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (this::gestureRecognizerHelper.isInitialized) {
             backgroundExecutor.execute { gestureRecognizerHelper.clearGestureRecognizer() }
         }
     }
@@ -350,6 +360,17 @@ class CameraFragment : Fragment(),
         super.onConfigurationChanged(newConfig)
         imageAnalyzer?.targetRotation =
             fragmentCameraBinding.viewFinder.display.rotation
+    }
+
+    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode)
+        if (isInPictureInPictureMode) {
+            fragmentCameraBinding.bottomSheetLayout.root.visibility = View.GONE
+            fragmentCameraBinding.recyclerviewResults.visibility = View.GONE
+        } else {
+            fragmentCameraBinding.bottomSheetLayout.root.visibility = View.VISIBLE
+            fragmentCameraBinding.recyclerviewResults.visibility = View.VISIBLE
+        }
     }
 
     // Update UI after a hand gesture has been recognized. Extracts original
