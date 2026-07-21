@@ -3,6 +3,8 @@ package com.google.mediapipe.examples.gesturerecognizer
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
 import android.graphics.Path
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 
@@ -35,6 +37,13 @@ class DroneControlAccessibilityService : AccessibilityService() {
                 Log.e("DRONE_CONTROL", "TOQUE CANCELADO! Verifique se a tela está ligada ou se há sobreposições.")
             }
         }, null)
+    }
+
+    // Simula toque com atraso
+    fun clickAt(x: Float, y: Float, delayMs: Long) {
+        Handler(Looper.getMainLooper()).postDelayed({
+            clickAt(x, y)
+        }, delayMs)
     }
 
     // Singleton para permitir que o GestureRecognizerHelper acesse o serviço
