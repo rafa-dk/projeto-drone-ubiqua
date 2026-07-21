@@ -335,21 +335,43 @@ class GestureRecognizerHelper(
         when (gesture) {
             "Thumb_Up" -> {
                 Log.i(TAG, "Executando: SUBIR")
-                DroneControlAccessibilityService.instance?.clickAt(725f, 460f)
-                lastActionTime = currentTime // Reseta o cronômetro
+                DroneControlAccessibilityService.instance?.clickAt(715f, 400f)
+                lastActionTime = currentTime
             }
-            "Victory" -> {
-                Log.i(TAG, "Executando: DECOLAR")
-                DroneControlAccessibilityService.instance?.clickAt(200f, 800f)
+            "Thumb_Down" -> {
+                Log.i(TAG, "Executando: DESCER")
+                DroneControlAccessibilityService.instance?.clickAt(715f, 900f)
                 lastActionTime = currentTime
             }
             "Open_Palm" -> {
-                Log.i(TAG, "Executando: POUSAR")
-                DroneControlAccessibilityService.instance?.clickAt(725f, 460f)
+                Log.i(TAG, "Executando: STOP (Pouso Emergencial)")
+                DroneControlAccessibilityService.instance?.clickAt(1350f, 1050f)
+                // Segundo clique após 1 segundo
+                DroneControlAccessibilityService.instance?.clickAt(1350f, 780f, 1000L)
+                lastActionTime = currentTime
+            }
+            "Victory" -> {
+                Log.i(TAG, "Executando: ROTACIONAR ESQUERDA")
+                DroneControlAccessibilityService.instance?.clickAt(480f, 680f)
+                lastActionTime = currentTime
+            }
+            "ILoveYou" -> {
+                Log.i(TAG, "Executando: ROTACIONAR DIREITA")
+                DroneControlAccessibilityService.instance?.clickAt(1000f, 680f)
+                lastActionTime = currentTime
+            }
+            "Pointing_Up" -> {
+                Log.i(TAG, "Executando: IR PARA FRENTE")
+                DroneControlAccessibilityService.instance?.clickAt(1950f, 400f)
+                lastActionTime = currentTime
+            }
+            "Closed_Fist" -> {
+                Log.i(TAG, "Executando: IR PARA TRÁS")
+                DroneControlAccessibilityService.instance?.clickAt(1950f, 900f)
                 lastActionTime = currentTime
             }
             "None" -> {
-                // Não faz nada e não reseta o tempo
+                // Não faz nada
             }
         }
     }
