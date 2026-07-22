@@ -40,10 +40,22 @@ class DroneControlAccessibilityService : AccessibilityService() {
     }
 
     // Simula toque com atraso
-    fun clickAt(x: Float, y: Float, delayMs: Long) {
-        Handler(Looper.getMainLooper()).postDelayed({
-            clickAt(x, y)
-        }, delayMs)
+    fun holdAt(x: Float, y: Float, durationMs: Long = 2000L) {
+        val path = Path()
+        path.moveTo(x, y)
+
+        val builder = GestureDescription.Builder()
+
+        // O segredo está no terceiro parâmetro: duration
+        // StrokeDescription(path, startTime, duration)
+        builder.addStroke(GestureDescription.StrokeDescription(path, 0, durationMs))
+
+        dispatchGesture(builder.build(), object : AccessibilityService.GestureResultCallback() {
+            override fun onCompleted(gestureDescription: GestureDescription?) {
+                super.onCompleted(gestureDescription)
+                Log.d("DRONE_CONTROL", "HOLD executado por ${durationMs}ms em: $x, $y")
+            }
+        }, null)
     }
 
     // Singleton para permitir que o GestureRecognizerHelper acesse o serviço

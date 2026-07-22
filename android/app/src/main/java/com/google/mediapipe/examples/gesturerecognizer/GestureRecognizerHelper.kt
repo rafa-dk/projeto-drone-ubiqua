@@ -321,7 +321,7 @@ class GestureRecognizerHelper(
 
     private var lastActionTime = 0L
     // Tempo em milissegundos que o sistema ignorará novos gestos após um sucesso
-    private val GESTURE_THROTTLE_MS = 2000L
+    private val GESTURE_THROTTLE_MS = 100L
 
     private fun processGestureForDrone(gesture: String) {
         val currentTime = System.currentTimeMillis()
@@ -335,40 +335,46 @@ class GestureRecognizerHelper(
         when (gesture) {
             "Thumb_Up" -> {
                 Log.i(TAG, "Executando: SUBIR")
-                DroneControlAccessibilityService.instance?.clickAt(715f, 400f)
+                DroneControlAccessibilityService.instance?.holdAt(1680f, 250f,1000)
                 lastActionTime = currentTime
             }
             "Thumb_Down" -> {
                 Log.i(TAG, "Executando: DESCER")
-                DroneControlAccessibilityService.instance?.clickAt(715f, 900f)
+                DroneControlAccessibilityService.instance?.holdAt(1820f, 224f,1000)
                 lastActionTime = currentTime
             }
             "Open_Palm" -> {
-                Log.i(TAG, "Executando: STOP (Pouso Emergencial)")
-                DroneControlAccessibilityService.instance?.clickAt(1350f, 1050f)
-                // Segundo clique após 1 segundo
-                DroneControlAccessibilityService.instance?.clickAt(1350f, 780f, 1000L)
-                lastActionTime = currentTime
-            }
-            "Victory" -> {
-                Log.i(TAG, "Executando: ROTACIONAR ESQUERDA")
-                DroneControlAccessibilityService.instance?.clickAt(480f, 680f)
-                lastActionTime = currentTime
-            }
-            "ILoveYou" -> {
-                Log.i(TAG, "Executando: ROTACIONAR DIREITA")
-                DroneControlAccessibilityService.instance?.clickAt(1000f, 680f)
-                lastActionTime = currentTime
-            }
-            "Pointing_Up" -> {
                 Log.i(TAG, "Executando: IR PARA FRENTE")
-                DroneControlAccessibilityService.instance?.clickAt(1950f, 400f)
-                lastActionTime = currentTime
+                DroneControlAccessibilityService.instance?.holdAt(1941f, 439f)
             }
             "Closed_Fist" -> {
                 Log.i(TAG, "Executando: IR PARA TRÁS")
-                DroneControlAccessibilityService.instance?.clickAt(1950f, 900f)
+                DroneControlAccessibilityService.instance?.holdAt(1952f, 882f)
                 lastActionTime = currentTime
+            }
+            "Pointing_Up" -> {
+                Log.i(TAG, "Executando: IR PARA A ESQUERDA")
+                DroneControlAccessibilityService.instance?.holdAt(1751f, 666f)
+                lastActionTime = currentTime
+            }
+            "Victory" -> {
+                Log.i(TAG, "Executando: IR PARA A DIREITA")
+                DroneControlAccessibilityService.instance?.holdAt(2184f, 686f)
+                lastActionTime = currentTime
+            }
+            "ILoveYou" -> {
+                Log.i(TAG, "Executando: POUSO EMERGENCIAL - PASSO 1")
+
+                // 1. Primeiro clique imediato
+                DroneControlAccessibilityService.instance?.holdAt(1360f, 1072f, 100)
+                // 2. Agenda o segundo clique para 1 segundo (1000ms) depois
+                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    Log.i(TAG, "Executando: POUSO EMERGENCIAL - PASSO 2")
+                    DroneControlAccessibilityService.instance?.holdAt(1350f, 780f, 100L)
+                }, 1000)
+
+                // para evitar que ele tente iniciar uma nova sequência enquanto esta ainda ocorre
+                lastActionTime = currentTime + 1000
             }
             "None" -> {
                 // Não faz nada
